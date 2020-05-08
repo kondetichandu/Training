@@ -1,0 +1,49 @@
+<html>
+    <body>
+        <script>
+            window.onload = function() {
+              var UIcontrol = (function(id,name)
+        {
+            var DOM= {
+                add:document.querySelector('.list'),
+            }
+            return {
+                addItem:function(id,name)
+                {
+                    //console.log(id,name);
+                    console.log(id);
+                  var html =' <div class= "list"><div class ="id">ID :%id% </div>Name :<a class ="name" href="#">%name%</a></div>';
+                  console.log(html);
+                  var newHtml = html.replace('%id%',id);
+                  console.log(newHtml);
+                  newHtml=newHtml.replace('%name%',name);
+                  console.log(newHtml);
+                  DOM.add.insertAdjacentHTML('beforebegin',newHtml);                
+                }
+            }
+        })();
+      
+             async function getEmployee() {
+                 var data = await fetch('http://dummy.restapiexample.com/api/v1/employees');
+                 var employeelist = await data.json();
+                 console.log(employeelist);
+                 var employees =  employeelist.data;
+                 for ( let i=0 ;i<employees.length; i++)
+                 {
+                     //console.log(employees[i].id);
+                     UIcontrol.addItem(employees[i].id,employees[i].employee_name);
+                 }
+             }
+             getEmployee();
+            }
+     </script>
+    </body>
+    <div class="menu">
+        <button class = "New Employee">New Employee</button>
+        <div class= "list">
+            <div class ="id">ID :id </div>
+            <!-- <p>Name:</p> -->
+            Name :<a class ="name">name</a>
+        </div>
+    </div>
+</html>
