@@ -1,0 +1,290 @@
+<html>
+  <style> 
+  body{
+    background-color:lightgray ;
+  }
+    .edit{
+    text-align: center;
+    background-color: blue;
+    width:200px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    padding: 5px;
+    display: none;
+    border-radius: 20px;
+  }
+  .okncancel {
+    text-align: center;
+    transform: 'translate(-50%,-50%)';
+  }
+  .details {
+    transform: 'translate(-50%,-50%)';
+    text-align: center;
+    background-color: aqua;
+     border-radius: 10px;
+  }
+  .update_btn  {
+    transform: 'translate(-50%,-50%)';
+    text-align: center;
+        /* background-color: aqua; */
+  }
+  .btn {
+    background-color:red;
+    color:black;
+  }
+  .btn:hover {
+    transform: scale(1.2);
+  }
+  .Employee_details {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    /* background-color:red; */
+    width: 200px;
+    padding: 10px;
+    border-radius: 20px;
+  }
+  .head {
+    font-size: 25px;
+  }
+  .emp{
+    float: left;
+    padding: 2px;
+}
+  .ch{
+    text-align: right;
+    padding: 2px;
+}
+.ok {
+  background-color: brown;
+  color: aliceblue;
+}
+.cancel {
+  background-color:brown ;
+  color: aliceblue;
+}
+.ok:hover,.cancel:hover{
+    transform: scale(1.2);
+  }
+ </style>
+
+    <body>
+      <script>
+      window.onload=function() {
+      const queryString = window.location.search;
+     //console.log(queryString);
+     //console.log(queryString);
+     const urlParams = new URLSearchParams(queryString);
+     //console.log(urlParams.entries());
+     let id= urlParams.get('id');
+     id=id-1;
+     //console.log(id);
+     var UIcontrol = (function() {
+      var DOM = {
+         details:document.querySelector('.details'),
+         ID:document.querySelector('.cheid'),
+         Name:document.querySelector('.chename'),
+         Salary:document.querySelector('.chesal'),
+         Age:document.querySelector('.cheage'),
+         edit: document.querySelector('.edit'),
+         update_btn:document.querySelector('.update_btn'),
+         upd:document.querySelector('.btn'),
+         okncancel:document.querySelector('.okncancel'),
+         ok:document.querySelector('.ok'),
+         cancel:document.querySelector('.cancel'),
+         updid:document.querySelector('.UID'),
+         updname:document.querySelector('.UName'),
+         updsalary:document.querySelector('.USalary'),
+         updage:document.querySelector('.UAge'),
+         head:document.querySelector('.head')
+      };
+      return {
+        Change:function(id,name,Salary,age) {
+          //console.log(id);
+          DOM.ID.textContent=id;
+          DOM.Name.textContent=name;
+          DOM.Salary.textContent=Salary;
+          DOM.Age.textContent=age;
+          DOM.updid.value = id;
+          //console.log(DOM.updid.value);
+          DOM.updname.value = name;
+          DOM.updsalary.value = Salary;
+          DOM.updage.value = age;
+        },
+        getDom:function() {
+          return DOM
+        }
+      };
+      console.log(DOM.updid.value);
+     }) ();
+      async function Assign(id){
+      var get= await fetch('http://dummy.restapiexample.com/api/v1/employees');
+      var employeelist=await get.json();
+      var employee = employeelist.data[id];
+      UIcontrol.Change(employee.id,
+      employee.employee_name,
+      employee.employee_salary,
+      employee.employee_age);
+    }
+      Assign(id);
+      var dom = UIcontrol.getDom();
+      dom.upd.addEventListener('click',function() {
+      dom.details.style.display = 'none';
+      dom.edit.style.display='block';
+      dom.update_btn.style.display='none';
+      dom.okncancel.style.display='block';
+      dom.head.style.display='none';
+    });
+    dom.cancel.addEventListener('click', async function() {
+      /*if(dom.updid.value!=="" ||
+         dom.updname.value!=="" || 
+         dom.updsalary.value!=="" ||
+         dom.updage.value!=="") {
+          alert("Please delete any field if you want");
+        }*/
+        dom.head.style.display='block';
+        dom.details.style.display ='block';
+        dom.edit.style.display = 'none';
+        dom.update_btn.style.display='block';
+        dom.okncancel.style.display='none';
+      var urlParams = new URLSearchParams(window. location.search);
+      var id = urlParams.get('id');
+      var promise = await fetch('http://dummy.restapiexample.com/api/v1/delete/{id}',{
+      method :'DELETE',
+      mode: 'cors', 
+      cache: 'no-cache',
+      credentials: 'same-origin',
+       headers: {
+          'Content-Type': 'application/json; charset=UTF-8'
+      },
+      redirect: 'follow', 
+      referrerPolicy: 'no-referrer', 
+      });
+      //console.log("hi");
+      var consume = await promise.json();
+      console.log(consume);
+      if(consume.status=="failed") {
+        dom.ID.textContent = dom.updid.value;
+        dom.Name.textContent = dom.updname.value;
+        dom.Salary.textContent = dom.updsalary.value;
+        dom.Age.textContent = dom.updage.value;
+        if(dom.updid.value=="" ||
+           dom.updname.value=="" ||
+           dom.updsalary.value==""||
+           dom.updage.value == "") {
+             alert("Item Deleted Successfully");
+           }
+      }
+      //dom.head.style.display='block';
+    });
+    //console.log(dom.ID.textContent);
+    dom.ok.addEventListener('click', async function() {
+      dom.head.style.display='block';
+      var chk= check(dom.updid.value,
+                     dom.updname.value,
+                     dom.updsalary.value,
+                     dom.updage.value);
+                     if(chk) {
+                      dom.edit.style.display="none";
+                      dom.okncancel.style.display='none';
+                      dom.details.style.display="block";
+                      dom.update_btn.style.display='block';
+                      var urlParams = new URLSearchParams(window. location.search);
+                      var id = urlParams.get('id');
+                      var promise = await fetch('http://dummy.restapiexample.com/api/v1/update/{id}',{
+                      method :'PUT',
+                      mode: 'cors', 
+                      cache: 'no-cache',
+                      credentials: 'same-origin',
+                      headers: {
+                     'Content-Type': 'application/json; charset=UTF-8'
+                     },
+                     redirect: 'follow', 
+                     referrerPolicy: 'no-referrer', 
+                     //body: JSON.stringify(data)
+                    });
+                //console.log(add);
+                var consume = await promise.json();
+                //console.log(check);
+                if(consume.status == "success"){
+                    window.alert("updated success fully");
+                    
+                    dom.ID.textContent = dom.updid.value;
+                    //console.log(DOM.age.textContent);
+                    dom.Name.textContent = dom.updname.value;
+                    dom.Salary.textContent = dom.updsalary.value;
+                    dom.Age.textContent = dom.updage.value;
+                }
+                     }
+               //dom.head.style.display='block';
+    });
+    var check = function (uid,
+                          uname, 
+                          usal,
+                          uage) {
+                            if(uid==""  ||
+                               uname == "" ||
+                               usal == "" ||
+                               uage == "") {
+                              alert("please  fill all the field");
+                              return false;
+                            }
+                            if (uid.split('.').length!=1) {
+                                alert("ID should not be decimal");
+                                return false;
+                            }
+                            else if(uname.match(/[^A-Za-z ]+/g)!=null) {
+                                     alert('Enter only characters');
+                                     return false;
+                          }else if (usal<1000) {
+                                     alert("Salary should be greater than 1000");
+                                     return false;
+                            } else if(uage.split('.').length !=1) {
+                                     alert("Age should not be decimal");
+                                     return false;
+                            } else return true;
+                          };
+  }
+    </script>
+    <body>
+      <div class="Employee_details">
+        <div class="head">Employee Details</div>
+        <div class= "details">
+          <div class="emp">ID </div>
+          <div class =" ch cheid"></div>
+          <br>
+          <div class="emp">Name</div>
+          <div class="ch chename"></div>
+          <br>
+          <div class ="emp">Salary</div>
+          <div class="ch chesal"></div>
+          <br>
+          <div class = "emp">Age</div>
+          <div class="ch cheage"></div>
+          <br>
+          </div>
+          <div class="update_btn"> 
+            <button class="btn">Update</button>
+            <!-- <button class="cancel">Cancel</button> -->
+          </div>
+      </div>
+      <div class ="edit">
+       <input class="UID" type="number" placeholder="ID">
+       <br>
+       <input class ="UName" type="text" placeholder="Employee Name">
+       <br>
+       <input class ="USalary" type="number" placeholder="Salary">
+       <br>
+       <input class ="UAge" type="numebr" placeholder="Age">
+       <br>
+       <div class="okncancel">
+        <button class ="ok">Ok</button>
+        <button class ="cancel">Cancel</button>
+        </button>      
+      </div>
+      </div>
+    </body>
+</html>
